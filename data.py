@@ -122,4 +122,4 @@ def create_dataloaders(data_dir: Path):
     X_test = test_container.get_X(vectorizer=vectorizer)
     y_test = test_container.get_category()
 
-    return X_train, y_train, X_test, y_test
+    return X_train, y_train, X_test, y_test, vectorizer
