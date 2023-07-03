@@ -3,6 +3,7 @@ from typing import List
 from sklearn.feature_extraction.text import TfidfVectorizer
 from pathlib import Path
 import json
+from sklearn.model_selection import train_test_split
 
 
 class Category:
@@ -97,3 +98,28 @@ def load_data(data_dir: Path):
                                 text=review_json['reviewText'],
                                 score=review_json['overall'])
                 reviews.append(review)
+
+    return reviews
+
+
+def create_dataloaders(data_dir: Path):
+
+    reviews = load_data(data_dir=data_dir)
+    train_dataset, test_dataset = train_test_split(reviews,
+                                                   test_size=0.2,
+                                                   random_state=42)
+
+    train_container = ReviewContainer(train_dataset)
+    test_container = ReviewContainer(test_dataset)
+
+    texts = train_container.get_text()
+    vectorizer = TfidfVectorizer()
+    vectorizer.fit(texts)
+
+    X_train = train_container.get_X(vectorizer=vectorizer)
+    y_train = train_container.get_category()
+
+    X_test = test_container.get_X(vectorizer=vectorizer)
+    y_test = test_container.get_category()
+
+    return X_train, y_train, X_test, y_test
