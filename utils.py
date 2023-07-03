@@ -3,7 +3,7 @@ from pathlib import Path
 import pickle
 import seaborn as sn
 import pandas as pd
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from data import Category
 
 
