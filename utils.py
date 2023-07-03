@@ -1,6 +1,10 @@
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, confusion_matrix
 from pathlib import Path
 import pickle
+import seaborn as sn
+import pandas as pd
+import matplotlib as plt
+from data import Category
 
 
 def test_model(model, X_test, y_test):
@@ -18,8 +22,11 @@ def save_model(model,
                directory: str):
 
     dir_path = Path(directory)
-    model_path = dir_path / model_name / "model.pkl"
-    vect_path = dir_path / model_name / "vectorizer.pkl"
+    model_dir = dir_path / model_name
+    model_dir.mkdir(parents=True, exist_ok=True)
+
+    model_path = model_dir / "model.pkl"
+    vect_path = model_dir / "vectorizer.pkl"
 
     with open(model_path, 'wb') as f:
         pickle.dump(model, f)
@@ -39,3 +46,26 @@ def load_model(path: Path):
         vectorizer = pickle.load(f)
 
     return model, vectorizer
+
+
+def plot_confusion_matrix(model,
+                          X_test,
+                          y_test):
+
+    y_pred = model.predict(X_test)
+
+    labels = [Category.ELECTRONICS,
+              Category.BOOKS,
+              Category.CLOTHING,
+              Category.GROCERY,
+              Category.PATIO]
+
+    conf_matrix = confusion_matrix(y_true=y_test,
+                                   y_pred=y_pred,
+                                   labels=labels)
+    df_confusion_matrix = pd.DataFrame(conf_matrix,
+                                       index=labels,
+                                       columns=labels)
+
+    sn.heatmap(df_confusion_matrix, annot=True, fmt='d')
+    plt.show()
