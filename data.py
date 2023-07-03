@@ -1,6 +1,8 @@
 from random import shuffle
 from typing import List
 from sklearn.feature_extraction.text import TfidfVectorizer
+from pathlib import Path
+import json
 
 
 class Category:
@@ -68,3 +70,30 @@ class ReviewContainer:
 
     def get_category(self):
         return [x.category for x in self.reviews]
+
+
+def load_data(data_dir: Path):
+    sufix = "_small.json"
+    file_names = [data_dir / ("Electronics" + sufix),
+                  data_dir / ("Books" + sufix),
+                  data_dir / ("Clothing" + sufix),
+                  data_dir / ("Grocery" + sufix),
+                  data_dir / ("Patio" + sufix)]
+
+    file_categories = [Category.ELECTRONICS,
+                       Category.BOOKS,
+                       Category.CLOTHING,
+                       Category.GROCERY,
+                       Category.PATIO]
+
+    reviews = []
+    for i in range(len(file_names)):
+        file_name = file_names[i]
+        category = file_categories[i]
+        with open(file_name) as filehandle:
+            for line in filehandle:
+                review_json = json.loads(line)
+                review = Review(category=category,
+                                text=review_json['reviewText'],
+                                score=review_json['overall'])
+                reviews.append(review)
